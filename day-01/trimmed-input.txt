@@ -1,0 +1,1 @@
+Order matters too. A reliable pattern is: instruction first, then context, then the clearly delimited input, then a restatement of the output format. Putting the format near the end keeps it fresh as the model begins generating.
