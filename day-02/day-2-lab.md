@@ -748,6 +748,7 @@ I decomposed the same task into three stages:
 
 #### Prompt
 
+```text
 Analyze and organize the raw Android development notes below before producing any educational content.
 
 Your task in this step is only to create a content plan.
@@ -784,6 +785,7 @@ Raw notes:
 - A new StateFlow collector immediately receives the current value.
 - A SharedFlow collector receives previous values only according to replay.
 - Using SharedFlow for navigation events avoids representing navigation as persistent UI state.
+```
 
 #### Model Output
 
@@ -855,6 +857,7 @@ Step 1 established both the supported facts and a list of claims that should not
 
 #### Prompt
 
+```text
 Using the content plan you just created, transform the raw notes into a concise educational section for an Android Engineering Handbook.
 
 The final result must include:
@@ -888,6 +891,7 @@ Raw notes:
 - A new StateFlow collector immediately receives the current value.
 - A SharedFlow collector receives previous values only according to replay.
 - Using SharedFlow for navigation events avoids representing navigation as persistent UI state.
+```
 
 #### Model Output
 
@@ -932,6 +936,7 @@ Use **StateFlow** for persistent UI state with a current value. Use **SharedFlow
 
 #### Prompt
 
+```text
 Review the handbook section you produced in the previous step against both:
 
 1. The original requirements.
@@ -958,6 +963,7 @@ Overall result: PASS or FAIL
 If the overall result is FAIL, list the minimum changes required to make it pass.
 
 Do not make the changes yet.
+```
 
 #### Model Output
 
