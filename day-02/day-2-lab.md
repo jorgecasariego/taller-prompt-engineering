@@ -959,8 +959,41 @@ Decomposition did not automatically produce a perfect final draft. Its main obse
 
 Therefore, for this task, decomposition improved the ability to inspect and diagnose the result, at the cost of additional prompts and tokens.
 
-...
 
 ## Reflection
 
-...
+### 1. Which technique gave the largest reliability improvement for your task, and why?
+
+The largest reliability improvement came from **clear output specifications and explicit constraints**.
+
+In Exercise 1, the fully specified prompt produced exactly the requested JSON structure with the correct fields, three symptoms, and no additional commentary. Interestingly, removing the output-format specification did not change the result in that particular run: the model still returned the same JSON structure.
+
+This showed me that a model may produce the desired format even without an explicit schema, but the behavior is then implicit rather than specified. For a task whose output may be consumed by another person or by software, I would prefer to make the expected structure explicit instead of relying on the model to choose it.
+
+### 2. Where did few-shot help, and where did it introduce bias?
+
+In my classification experiment, **few-shot did not produce an observable accuracy improvement**. The zero-shot version already classified all five Android bug reports as expected, and the balanced few-shot version produced exactly the same 5/5 result.
+
+The deliberately biased version also did not produce observable label bias. Even after providing three examples labeled `DATA`, the model still predicted `DATA` for only 2 of 5 inputs, exactly the same count as the zero-shot and balanced few-shot versions.
+
+Therefore, this experiment did not demonstrate either an accuracy improvement or measurable example bias. It showed me that few-shot examples are not automatically necessary: when the task is already clear enough for zero-shot prompting, examples may add prompt length without producing an observable benefit.
+
+### 3. Did decomposition improve verifiability or make errors easier to isolate?
+
+Yes. **Decomposition improved verifiability and error isolation**, although it did not automatically produce a perfect final result.
+
+The single-prompt approach generated the handbook section directly, which was faster but combined interpretation, organization, transformation, formatting, and implicit validation into one response.
+
+The multi-prompt approach separated those responsibilities into planning, transformation, and QA. The planning stage established which claims were supported and unsupported. The QA stage could then identify specific unsupported elements in the generated section and trace them back to the earlier plan.
+
+The QA stage was itself imperfect, which was also useful to observe. Decomposition did not guarantee correctness, but it made intermediate decisions visible and made failures easier to locate and inspect.
+
+### 4. What is your default prompting strategy going forward?
+
+My default strategy will be to **start with a precise zero-shot prompt before adding complexity**.
+
+I will clearly specify the task, constraints, expected output, and relevant context. If zero-shot produces consistent results, I will avoid adding examples unnecessarily. I will use few-shot when the model needs examples to understand ambiguous classifications, edge cases, or a specific output pattern.
+
+For larger tasks involving several kinds of reasoning or transformation, I will decompose the work into smaller stages and verify important intermediate outputs before continuing.
+
+Finally, I will use role and system-level instructions when behavior needs to remain consistent across multiple interactions, especially for durable constraints such as tone, output structure, and rules against unsupported assumptions.
