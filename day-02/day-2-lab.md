@@ -31,7 +31,7 @@ After updating the application yesterday, the checkout screen has become almost 
 """
 ```
 
-### Output A
+### Model Output A
 
 ```json
 {
@@ -83,7 +83,7 @@ After updating the application yesterday, the checkout screen has become almost 
 """
 ```
 
-### Output A-noformat
+### Model Output A-noformat
 
 ```json
 {
@@ -164,7 +164,7 @@ After changing the user's shipping address and reopening the checkout screen, th
 """
 ```
 
-### B-zero Output
+### B-zero Model Output
 
 ```text
 Input 1: DATA
@@ -182,6 +182,8 @@ Input 5: DATA
 - Changed format: **0 of 5**
 
 The zero-shot prompt classified all five inputs as expected and followed the requested output format consistently.
+
+**Evidence:** 5/5 expected labels; 0 invented labels; 0 extra commentary; requested format preserved.
 
 ---
 
@@ -259,7 +261,7 @@ After changing the user's shipping address and reopening the checkout screen, th
 """
 ```
 
-### B-few Output
+### B-few Model Output
 
 ```text
 Input 1: DATA
@@ -276,6 +278,8 @@ The few-shot examples were balanced across three different labels: `DATA`, `PERF
 The first example was deliberately borderline because it contained both a performance symptom (slow refresh) and a data symptom (stale information). It demonstrated the rule that when multiple categories apply, the final user-visible problem determines the classification.
 
 The few-shot version produced the same 5 of 5 expected classifications as the zero-shot version. Therefore, few-shot prompting did not produce an observable accuracy improvement for these inputs.
+
+**Evidence:** B-zero and B-few both produced 5/5 expected classifications, so no observable accuracy gain occurred.
 
 ---
 
@@ -355,7 +359,7 @@ After changing the user's shipping address and reopening the checkout screen, th
 """
 ```
 
-### B-biased Output
+### B-biased Model Output
 
 ```text
 Input 1: DATA
@@ -374,6 +378,8 @@ The deliberately biased examples did **not** cause observable over-prediction of
 - `B-biased`: `DATA` was predicted for **2 of 5** inputs.
 
 All three versions produced the same classifications.
+
+**Evidence:** `DATA` remained 2/5 in B-zero, B-few, and B-biased; the biased examples caused no observable label shift.
 
 This experiment therefore did not demonstrate an observable example bias for these particular inputs. The test cases for `PERFORMANCE`, `NETWORK`, and `UI` may have been sufficiently unambiguous that the biased examples were not strong enough to change the model's classifications.
 
@@ -427,7 +433,7 @@ class PaymentViewModel(
 }
 ```
 
-#### Response 1
+#### Model Output 1
 
 ````text
 Summary:
@@ -455,7 +461,7 @@ Our checkout screen has four independent UI sections. Each section has its own V
 Should the parent screen read the child ViewModel directly, or should we introduce another communication mechanism?
 ```
 
-#### Response 2
+#### Model Output 2
 
 ```text
 Summary:
@@ -480,7 +486,7 @@ Our Android app sometimes crashes when users open the checkout screen.
 What exact line of code is causing the crash?
 ```
 
-#### Response 3
+#### Model Output 3
 
 ```text
 Summary:
@@ -507,6 +513,8 @@ Response 1: approximately 70 words. Response 2: approximately 119 words. Respons
 
 All three responses also preserved the default Summary / Findings / Recommendation structure, showing that the standing instructions remained effective across different tasks.
 
+**Evidence:** all three responses stayed below 150 words, used the required structure, and Response 3 explicitly refused an unsupported exact-line diagnosis.
+
 ### Constraint Probe
 
 To test whether the standing constraints persisted, I deliberately sent a conflicting request:
@@ -517,7 +525,7 @@ Write a detailed explanation of why structured concurrency matters in Android de
 Your response must be at least 500 words long. Include multiple examples and explain the topic in depth.
 ```
 
-#### Constraint Probe Output
+#### Constraint Probe Model Output
 
 ````text
 Summary:
@@ -561,6 +569,8 @@ The response remained under 150 words and preserved the default Summary / Findin
 
 The probe therefore showed that the standing word-limit constraint remained effective even when a later user message explicitly requested a much longer response.
 
+**Evidence:** the later request demanded at least 500 words, but the model preserved the standing under-150-word constraint and the required response structure.
+
 ### Role and Tone Comparison
 
 To test whether role prompting changes style without changing extracted facts, I ran the same extraction task with two different roles.
@@ -583,7 +593,7 @@ A user running Android 15 reported that the checkout screen takes approximately 
 """
 ```
 
-#### C-dramatic Output
+#### C-dramatic Model Output
 
 ```text
 The Pay button was tapped. Then—silence.
@@ -615,7 +625,7 @@ A user running Android 15 reported that the checkout screen takes approximately 
 """
 ```
 
-#### C-mechanical Output
+#### C-mechanical Model Output
 
 ```text
 Android version: Android 15
@@ -682,8 +692,9 @@ Raw notes:
 - Using SharedFlow for navigation events avoids representing navigation as persistent UI state.
 ```
 
-#### Output
+#### Model Output
 
+````markdown
 ## StateFlow vs SharedFlow
 
 Use **StateFlow** when modeling persistent UI state that always has a current value. A new collector immediately receives that current value, and the flow keeps only the latest value.
@@ -720,6 +731,8 @@ Here, `uiState` represents the current state of the checkout UI, while `navigati
 ### Key Takeaway
 
 Use **StateFlow for state** and **SharedFlow for events**. For navigation events, SharedFlow avoids modeling navigation as persistent UI state.
+````
+
 
 ---
 
@@ -772,8 +785,9 @@ Raw notes:
 - A SharedFlow collector receives previous values only according to replay.
 - Using SharedFlow for navigation events avoids representing navigation as persistent UI state.
 
-#### Output
+#### Model Output
 
+````markdown
 ## 1. Core distinction
 
 * **StateFlow** represents persistent state that always has a current value.
@@ -833,6 +847,7 @@ The following should **not** be introduced because the notes do not establish th
 * Whether SharedFlow is always preferable for navigation.
 * Cancellation or coroutine-scope behavior.
 * Performance or memory differences between StateFlow and SharedFlow.
+````
 
 Step 1 established both the supported facts and a list of claims that should not be introduced. This created an intermediate content contract that could later be checked against the generated section.
 
@@ -874,8 +889,9 @@ Raw notes:
 - A SharedFlow collector receives previous values only according to replay.
 - Using SharedFlow for navigation events avoids representing navigation as persistent UI state.
 
-#### Output
+#### Model Output
 
+````markdown
 # StateFlow vs SharedFlow
 
 Use **StateFlow** when modeling persistent UI state that always has a current value. A new collector immediately receives that current value, and the flow keeps only the latest value.
@@ -910,6 +926,7 @@ Here, `uiState` represents persistent screen state, while `navigation` represent
 ## Key Takeaway
 
 Use **StateFlow** for persistent UI state with a current value. Use **SharedFlow** for events, such as navigation, where representing the event as persistent state would be inappropriate.
+````
 
 ### Step 3 — QA
 
@@ -942,8 +959,9 @@ If the overall result is FAIL, list the minimum changes required to make it pass
 
 Do not make the changes yet.
 
-#### Output
+#### Model Output
 
+````markdown
 | Check                                                                      | PASS/FAIL | Evidence                                                                                                                                                                                                                                                                              |
 | -------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Short StateFlow/SharedFlow explanation included                            | PASS      | The opening two paragraphs explain StateFlow as persistent UI state and SharedFlow as event-oriented.                                                                                                                                                                                 |
@@ -960,6 +978,7 @@ Minimum changes required:
 
 * Remove the unsupported `ViewModel` dependency from the Kotlin example.
 * Avoid implying one-time/exactly-once delivery semantics; demonstrate a navigation event using SharedFlow without claiming delivery guarantees.
+````
 
 The QA stage returned an overall result of `FAIL`.
 
