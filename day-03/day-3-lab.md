@@ -409,9 +409,6 @@ print("Details:", details)
 Result: False
 Details: {'req1 (Android >= 5)': True, 'req2 (Kotlin >= 3)': True, 'req3 (Apps >= 2)': True, 'compose_ok': False}
 
-
-```
-
 To evaluate whether the candidate qualifies for the Senior Android certification, each requirement is checked step-by-step against the candidate's credentials:
 
 * **Android Experience:** The candidate has **6 years** of experience (Requirement: at least 5 years) — **Met**
