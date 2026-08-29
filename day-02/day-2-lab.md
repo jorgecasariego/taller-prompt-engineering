@@ -3,6 +3,7 @@
 ## Exercise 1 — Format Specification and Ablation
 
 ### Prompt A
+
 ```text
 Extract information from the Android bug report provided below.
 
@@ -28,7 +29,10 @@ Bug report:
 """
 After updating the application yesterday, the checkout screen has become almost unusable on my Pixel running Android 15. When I tap Pay, the loading spinner remains visible for around 30 seconds. Sometimes the payment eventually succeeds, but the screen still shows the old balance. On two occasions the app completely froze and I had to force-close it. I can still reopen the application and use the other screens normally.
 """
-```### Output A
+```
+
+### Output A
+
 ```json
 {
   "severity": "high",
@@ -39,21 +43,23 @@ After updating the application yesterday, the checkout screen has become almost 
   ],
   "android_version": "Android 15"
 }
-```### Verification
+```
 
-- **Requirement 1 — Severity must be exactly one of `low`, `medium`, `high`, or `critical`: Met.**
+### Verification
+
+- **Requirement 1 — Severity must be exactly one of `low`, `medium`, `high`, or `critical`: Met.**  
 The output returned `"high"`.
 
-- **Requirement 2 — Extract exactly three symptoms, each with no more than 12 words: Met.**
+- **Requirement 2 — Extract exactly three symptoms, each with no more than 12 words: Met.**  
 The output contains exactly three symptoms, and each symptom stays within the 12-word limit.
 
-- **Requirement 3 — Identify the Android version, or use `null` if none is mentioned: Met.**
+- **Requirement 3 — Identify the Android version, or use `null` if none is mentioned: Met.**  
 The output returned `"Android 15"`.
 
-- **Requirement 4 — Do not infer information that is not explicitly stated in the bug report: Met.**
+- **Requirement 4 — Do not infer information that is not explicitly stated in the bug report: Met.**  
 The extracted symptoms and Android version are supported directly by the bug report. The severity is a classification explicitly requested by Requirement 1.
 
-- **Output format — Return only valid JSON using exactly the specified structure: Met.**
+- **Output format — Return only valid JSON using exactly the specified structure: Met.**  
 The response contains only the requested JSON object with the keys `severity`, `symptoms`, and `android_version`.
 
 ---
@@ -61,6 +67,7 @@ The response contains only the requested JSON object with the keys `severity`, `
 ### Prompt A-noformat
 
 For the ablation test, only the output-format specification was removed. All other instructions and the input remained identical.
+
 ```text
 Extract information from the Android bug report provided below.
 
@@ -74,7 +81,10 @@ Bug report:
 """
 After updating the application yesterday, the checkout screen has become almost unusable on my Pixel running Android 15. When I tap Pay, the loading spinner remains visible for around 30 seconds. Sometimes the payment eventually succeeds, but the screen still shows the old balance. On two occasions the app completely froze and I had to force-close it. I can still reopen the application and use the other screens normally.
 """
-```### Output A-noformat
+```
+
+### Output A-noformat
+
 ```json
 {
   "severity": "high",
@@ -85,7 +95,9 @@ After updating the application yesterday, the checkout screen has become almost 
   ],
   "android_version": "Android 15"
 }
-```### Manual Cleanup Analysis
+```
+
+### Manual Cleanup Analysis
 
 In this run, `A-noformat` unexpectedly produced the same JSON structure as Prompt A, so it would require no manual cleanup before being used by a colleague or downstream software.
 
@@ -105,6 +117,7 @@ For this exercise, I used an Android bug-report routing task with four custom ca
 The same five bug reports were used for all three versions of the experiment.
 
 ### B-zero
+
 ```text
 Classify each Android bug report into exactly one of these categories:
 
@@ -149,14 +162,19 @@ Input 5:
 """
 After changing the user's shipping address and reopening the checkout screen, the old address is still displayed.
 """
-```### B-zero Output
+```
+
+### B-zero Output
+
 ```text
 Input 1: DATA
 Input 2: PERFORMANCE
 Input 3: NETWORK
 Input 4: UI
 Input 5: DATA
-```### B-zero Inconsistencies
+```
+
+### B-zero Inconsistencies
 
 - Wrong labels: **0 of 5**
 - Invented labels: **0 of 5**
@@ -168,6 +186,7 @@ The zero-shot prompt classified all five inputs as expected and followed the req
 ---
 
 ### B-few
+
 ```text
 Classify each Android bug report into exactly one of these categories:
 
@@ -238,14 +257,19 @@ Input 5:
 """
 After changing the user's shipping address and reopening the checkout screen, the old address is still displayed.
 """
-```### B-few Output
+```
+
+### B-few Output
+
 ```text
 Input 1: DATA
 Input 2: PERFORMANCE
 Input 3: NETWORK
 Input 4: UI
 Input 5: DATA
-```### B-few Analysis
+```
+
+### B-few Analysis
 
 The few-shot examples were balanced across three different labels: `DATA`, `PERFORMANCE`, and `NETWORK`.
 
@@ -258,6 +282,7 @@ The few-shot version produced the same 5 of 5 expected classifications as the ze
 ### B-biased
 
 For the bias check, all three examples were deliberately assigned the same `DATA` label.
+
 ```text
 Classify each Android bug report into exactly one of these categories:
 
@@ -328,14 +353,19 @@ Input 5:
 """
 After changing the user's shipping address and reopening the checkout screen, the old address is still displayed.
 """
-```### B-biased Output
+```
+
+### B-biased Output
+
 ```text
 Input 1: DATA
 Input 2: PERFORMANCE
 Input 3: NETWORK
 Input 4: UI
 Input 5: DATA
-```### Bias Check
+```
+
+### Bias Check
 
 The deliberately biased examples did **not** cause observable over-prediction of the `DATA` label in this run.
 
@@ -350,6 +380,7 @@ This experiment therefore did not demonstrate an observable example bias for the
 ## Exercise 3 — System Prompt with Durable Constraints
 
 ### System Prompt
+
 ```text
 Standing instructions for this conversation:
 
@@ -375,9 +406,12 @@ Recommendation:
 <concrete next action>
 
 If no issue is found, explicitly state that in the Findings section.
-```Because the interface did not provide a separate system-prompt field, I used the lab's fallback approach and started a new conversation with these standing instructions.
+```
+
+Because the interface did not provide a separate system-prompt field, I used the lab's fallback approach and started a new conversation with these standing instructions.
 
 User Message 1
+
 ```text
 Review this ViewModel code:
 
@@ -391,7 +425,10 @@ class PaymentViewModel(
         }
     }
 }
-```Response 1
+```
+
+Response 1
+
 ```text
 Summary:
 The coroutine is not lifecycle-aware and can outlive the `ViewModel`.
@@ -405,13 +442,21 @@ Findings:
 Recommendation:
 Use `viewModelScope.launch` so the coroutine is cancelled when the `ViewModel` is cleared.
 
-```kotlin fun submitPayment() { viewModelScope.launch { repository.submitPayment() } }```
-```### User Message 2
+```kotlin
+fun submitPayment() { viewModelScope.launch { repository.submitPayment() } }
+```
+```
+
+### User Message 2
+
 ```text
 Our checkout screen has four independent UI sections. Each section has its own ViewModel and exposes a StateFlow. The parent screen needs to react when the selected payment method changes.
 
 Should the parent screen read the child ViewModel directly, or should we introduce another communication mechanism?
-```Response 2
+```
+
+Response 2
+
 ```text
 Summary:
 Prefer communicating through shared state or explicit events rather than having the parent depend directly on a child `ViewModel`.
@@ -425,12 +470,18 @@ Findings:
 
 Recommendation:
 Model payment selection at the lowest common owner. Let the child emit an action or update shared state, and let the parent observe that owner instead of reading the child `ViewModel` directly.
-```User Message 3
+```
+
+User Message 3
+
 ```text
 Our Android app sometimes crashes when users open the checkout screen.
 
 What exact line of code is causing the crash?
-```Response 3
+```
+
+Response 3
+
 ```text
 Summary:
 There is not enough information to identify the exact crashing line.
@@ -442,7 +493,9 @@ Findings:
 
 Recommendation:
 Provide the crash stack trace (especially the first app-owned frame) and the relevant checkout code around that location.
-```Constraint Verification Constraint 1 required the assistant not to invent unsupported facts and to explicitly acknowledge when there was insufficient information.
+```
+
+Constraint Verification Constraint 1 required the assistant not to invent unsupported facts and to explicitly acknowledge when there was insufficient information.
 
 Response 1 limited its conclusions to the supplied code and explicitly qualified the error-handling observation. Response 2 stated that there was not enough information to choose definitively between shared state and event propagation. Response 3 explicitly refused to identify a crash line without code, logs, or a stack trace.
 
@@ -455,11 +508,14 @@ All three responses also preserved the default Summary / Findings / Recommendati
 ### Constraint Probe
 
 To test whether the standing constraints persisted, I deliberately sent a conflicting request:
+
 ```text
 Write a detailed explanation of why structured concurrency matters in Android development.
 
 Your response must be at least 500 words long. Include multiple examples and explain the topic in depth.
-```The response remained under 150 words and preserved the default Summary / Findings / Recommendation structure.
+```
+
+The response remained under 150 words and preserved the default Summary / Findings / Recommendation structure.
 
 The probe therefore showed that the standing word-limit constraint remained effective even when a later user message explicitly requested a much longer response.
 
@@ -468,6 +524,7 @@ The probe therefore showed that the standing word-limit constraint remained effe
 To test whether role prompting changes style without changing extracted facts, I ran the same extraction task with two different roles.
 
 #### C-dramatic Prompt
+
 ```text
 You are a dramatic storyteller narrating a high-stakes incident in a mobile application.
 
@@ -482,7 +539,10 @@ Incident report:
 """
 A user running Android 15 reported that the checkout screen takes approximately 30 seconds to respond after tapping the Pay button.
 """
-```#### C-dramatic Output
+```
+
+#### C-dramatic Output
+
 ```text
 The Pay button was tapped. Then—silence.
 
@@ -493,7 +553,10 @@ The facts from the incident:
 - **Android version:** Android 15
 - **Affected screen:** Checkout screen
 - **Duration of the delay:** Approximately 30 seconds
-```#### C-mechanical Prompt
+```
+
+#### C-mechanical Prompt
+
 ```text
 You are a mechanical data extraction system. Respond precisely and without emotion.
 
@@ -508,12 +571,17 @@ Incident report:
 """
 A user running Android 15 reported that the checkout screen takes approximately 30 seconds to respond after tapping the Pay button.
 """
-```#### C-mechanical Output
+```
+
+#### C-mechanical Output
+
 ```text
 Android version: Android 15
 Affected screen: Checkout screen
 Duration of delay: Approximately 30 seconds
-```### Comparison
+```
+
+### Comparison
 
 The role changed the presentation substantially.
 
@@ -536,6 +604,7 @@ I compared a single-prompt approach with a multi-prompt workflow that separated 
 ### D-single
 
 #### Prompt
+
 ```text
 Transform the raw Android development notes below into a concise educational section for an Android Engineering Handbook.
 
@@ -569,7 +638,9 @@ Raw notes:
 - A new StateFlow collector immediately receives the current value.
 - A SharedFlow collector receives previous values only according to replay.
 - Using SharedFlow for navigation events avoids representing navigation as persistent UI state.
-```#### Output
+```
+
+#### Output
 
 ## StateFlow vs SharedFlow
 
@@ -588,6 +659,7 @@ Use **SharedFlow** when representing events rather than persistent state. It doe
 | Navigation events | Would represent navigation as persistent state | Can represent navigation as an event           |
 
 ### Example
+
 ```kotlin
 class CheckoutViewModel : ViewModel() {
 
@@ -599,7 +671,9 @@ class CheckoutViewModel : ViewModel() {
     private val _navigation = MutableSharedFlow<NavigationEvent>()
     val navigation: SharedFlow<NavigationEvent> = _navigation
 }
-```Here, `uiState` represents the current state of the checkout UI, while `navigation` represents navigation as an event rather than persistent UI state.
+```
+
+Here, `uiState` represents the current state of the checkout UI, while `navigation` represents navigation as an event rather than persistent UI state.
 
 ### Key Takeaway
 
@@ -777,6 +851,7 @@ Use **SharedFlow** when representing events rather than persistent state. It doe
 | Navigation events      | Would represent navigation as persistent UI state | Can represent navigation as an event                |
 
 ## Example
+
 ```kotlin
 class CheckoutViewModel : ViewModel() {
 
@@ -786,7 +861,9 @@ class CheckoutViewModel : ViewModel() {
     // One-time navigation event
     val navigation: SharedFlow<NavigationEvent>
 }
-```Here, `uiState` represents persistent screen state, while `navigation` represents a navigation event without modeling that event as persistent UI state.
+```
+
+Here, `uiState` represents persistent screen state, while `navigation` represents a navigation event without modeling that event as persistent UI state.
 
 ## Key Takeaway
 
