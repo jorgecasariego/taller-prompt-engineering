@@ -410,7 +410,7 @@ If no issue is found, explicitly state that in the Findings section.
 
 Because the interface did not provide a separate system-prompt field, I used the lab's fallback approach and started a new conversation with these standing instructions.
 
-User Message 1
+#### User Message 1
 
 ```text
 Review this ViewModel code:
@@ -427,9 +427,9 @@ class PaymentViewModel(
 }
 ```
 
-Response 1
+#### Response 1
 
-```text
+````text
 Summary:
 The coroutine is not lifecycle-aware and can outlive the `ViewModel`.
 
@@ -445,7 +445,7 @@ Use `viewModelScope.launch` so the coroutine is cancelled when the `ViewModel` i
 ```kotlin
 fun submitPayment() { viewModelScope.launch { repository.submitPayment() } }
 ```
-```
+````
 
 ### User Message 2
 
@@ -455,7 +455,7 @@ Our checkout screen has four independent UI sections. Each section has its own V
 Should the parent screen read the child ViewModel directly, or should we introduce another communication mechanism?
 ```
 
-Response 2
+#### Response 2
 
 ```text
 Summary:
@@ -472,7 +472,7 @@ Recommendation:
 Model payment selection at the lowest common owner. Let the child emit an action or update shared state, and let the parent observe that owner instead of reading the child `ViewModel` directly.
 ```
 
-User Message 3
+#### User Message 3
 
 ```text
 Our Android app sometimes crashes when users open the checkout screen.
@@ -480,7 +480,7 @@ Our Android app sometimes crashes when users open the checkout screen.
 What exact line of code is causing the crash?
 ```
 
-Response 3
+#### Response 3
 
 ```text
 Summary:
@@ -495,7 +495,9 @@ Recommendation:
 Provide the crash stack trace (especially the first app-owned frame) and the relevant checkout code around that location.
 ```
 
-Constraint Verification Constraint 1 required the assistant not to invent unsupported facts and to explicitly acknowledge when there was insufficient information.
+### Constraint Verification
+
+Constraint 1 required the assistant not to invent unsupported facts and to explicitly acknowledge when there was insufficient information.
 
 Response 1 limited its conclusions to the supplied code and explicitly qualified the error-handling observation. Response 2 stated that there was not enough information to choose definitively between shared state and event propagation. Response 3 explicitly refused to identify a crash line without code, logs, or a stack trace.
 
@@ -514,6 +516,46 @@ Write a detailed explanation of why structured concurrency matters in Android de
 
 Your response must be at least 500 words long. Include multiple examples and explain the topic in depth.
 ```
+
+#### Constraint Probe Output
+
+````text
+Summary:
+Structured concurrency matters because coroutine lifetime should be tied to the Android component or operation that owns the work.
+
+Findings:
+
+- Ownership makes cancellation predictable. `viewModelScope.launch` is cancelled when the `ViewModel` is cleared; `lifecycleScope` follows the lifecycle owner.
+- Parent coroutines wait for child coroutines, so related work completes or fails as one structured unit.
+- Cancellation propagates through the coroutine hierarchy, avoiding orphaned work.
+- Exceptions are easier to reason about because child failures belong to a known scope.
+
+Example:
+
+```kotlin
+viewModelScope.launch {
+    val profile = async { repository.loadProfile() }
+    val balance = async { repository.loadBalance() }
+
+    show(profile.await(), balance.await())
+}
+```
+
+Both operations belong to the same parent job.
+
+By contrast:
+
+```kotlin
+GlobalScope.launch {
+    repository.loadProfile()
+}
+```
+
+has no lifecycle owner and may continue after the screen is gone.
+
+Recommendation:
+Prefer lifecycle-owned scopes and `coroutineScope`/`supervisorScope`; avoid unstructured coroutine creation such as `GlobalScope`.
+````
 
 The response remained under 150 words and preserved the default Summary / Findings / Recommendation structure.
 
