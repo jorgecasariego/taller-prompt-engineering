@@ -67,6 +67,45 @@ Few-shot examples are useful when examples clarify ambiguity or edge cases, but 
 
 ---
 
+### Day 3 — Advanced Techniques
+
+Topics covered:
+
+- Explicit step-by-step reasoning
+- Reasoning vs. direct prompting
+- Prompt chaining
+- Intermediate output inspection
+- Self-checking with explicit criteria
+- Grounded question answering
+- Verbatim source verification
+- Refusal behavior
+- Grounding ablation
+- Prompt injection and instruction/data separation
+
+**Lab:** [Day 3 — Advanced Techniques](day-03/day-3-lab.md)
+
+#### Experiments
+
+The Day 3 lab evaluates advanced prompting techniques through controlled experiments:
+
+- Direct answers vs. explicit step-by-step reasoning
+- Reasoning on a harder multi-condition problem
+- A three-link prompt chain with intermediate inspection
+- Corrected vs. uncorrected chain propagation
+- Self-checking with an intentionally injected error
+- Grounded QA with supported, missing, and ambiguous questions
+- Verbatim quote verification against the source
+- Grounded vs. ungrounded behavior through ablation
+- Prompt injection with and without an explicit instruction/data guard
+
+#### Key takeaway
+
+Advanced prompting techniques are most useful when they make intermediate reasoning, evidence, and failures easier to inspect rather than simply making prompts longer.
+
+Grounding and explicit verification can reduce unsupported answers, but citations and prompt-injection guards still need to be evaluated rather than assumed to guarantee correctness.
+
+---
+
 ## Repository Structure
 
 ```text
@@ -79,6 +118,8 @@ taller-prompt-engineering/
 │   └── trimmed-input.txt
 ├── day-02/
 │   └── day-2-lab.md
+├── day-03/
+│   └── day-3-lab.md
 └── day-04/
 ```
 
@@ -103,7 +144,7 @@ This means that an experiment is still useful when a technique produces no measu
 
 The repository currently explores:
 
-`Prompt Engineering` · `LLMs` · `Zero-shot` · `Few-shot` · `Prompt Ablation` · `Role Prompting` · `System Prompts` · `Prompt Decomposition` · `Structured Output` · `Token Efficiency` · `LLM Evaluation`
+`Prompt Engineering` · `LLMs` · `Zero-shot` · `Few-shot` · `Prompt Ablation` · `Role Prompting` · `System Prompts` · `Prompt Decomposition` · `Prompt Chaining` · `Step-by-step Reasoning` · `Self-checking` · `Grounding` · `Prompt Injection` · `Structured Output` · `Token Efficiency` · `LLM Evaluation`
 
 ---
 
